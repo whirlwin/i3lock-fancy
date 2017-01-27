@@ -26,7 +26,7 @@ while true ; do
         -h|--help)
             printf "Usage: $(basename $0) [options]\n\n$OPTIONS\n\n" ; exit 1 ;;
         -g|--greyscale) HUE=(-level 0%,100%,0.6 -set colorspace Gray -separate -average) ; shift ;;
-        -p|--pixelate) EFFECT=(-scale 10% -scale 1000%) ; shift ;;
+        -p|--pixelate) EFFECT=(-scale 20% -scale 500%) ; shift ;;
         -f|--font)
             case "$2" in
                 "") shift 2 ;;
@@ -42,16 +42,17 @@ SCRIPTPATH=$(realpath "$0")
 SCRIPTPATH=${SCRIPTPATH%/*}
 
 # l10n support
-TEXT="Type password to unlock"
+TEXT=""
 case "$LANG" in
     de_* ) TEXT="Bitte Passwort eingeben" ;; # Deutsch
-    en_* ) TEXT="Type password to unlock" ;; # English
+    en_* ) TEXT="" ;; # English
     es_* ) TEXT="Ingrese su contraseña" ;; # Española
     fr_* ) TEXT="Entrez votre mot de passe" ;; # Français
     pl_* ) TEXT="Podaj hasło" ;; # Polish
 esac
 
-scrot -z "$IMAGE"
+gnome-screenshot -f "$IMAGE"
+
 ICON="$SCRIPTPATH/lock.png"
 PARAM=(--textcolor=ffffff00 --insidecolor=ffffff1c --ringcolor=ffffff3e \
        --linecolor=ffffff00 --keyhlcolor=00000080 --ringvercolor=00000000 \
@@ -77,7 +78,8 @@ do
     fi
 done <<<"$(xrandr)"
 
-convert "$IMAGE" "${HUE[@]}" "${EFFECT[@]}" "${LOCK[@]}" "$IMAGE"
+#convert "$IMAGE" "${HUE[@]}" "${EFFECT[@]}" "${LOCK[@]}" "$IMAGE"
+convert "$IMAGE" "${HUE[@]}" "${EFFECT[@]}" "$IMAGE"
 
 # try to use a forked version of i3lock with prepared parameters
 if ! i3lock -n "${PARAM[@]}" -i "$IMAGE" > /dev/null 2>&1; then
